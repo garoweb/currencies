@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Angular Test</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+		
+	</head>
+	<body>
+		<div class="container" ng-app="myApp" ng-controller="myCtrl">
+		  <div class="row">
+		  	<div class="col-md-12 text-center">
+		  		<h1>Calculator</h1>
+		  	</div>
+		  </div>
+
+
+		  <div class="row">
+
+		  	<div class="col-md-5 text-center">
+
+		  		<div class="form-group">
+				  <label for="usr"> Name:</label>
+				  <input type="number" class="form-control" id="usr" ng-model="currencie1" ng-value="1" min="1">
+				</div>
+
+				<div class="form-group">
+				  <select class="form-control" ng-model="rate1" id="sel1" >
+				  	<option value="EUR">EUR</option>
+				    <option ng-repeat="(key, value) in currencies" ng-value="{{ key }}" ng-if="$index == 1 == 0">{{ key }}</option>
+				  </select>
+				 
+				</div>
+
+		  	</div>
+
+
+		  	<div class="col-md-2 text-center">
+		  		<b>To</b>
+		  		<hr />
+		  		<button class='btn btn-success' ng-click="calculate()">Calculate</button>
+		  	</div>
+
+
+		  	<div class="col-md-5 text-center">
+		  		<div class="form-group">
+				  <label for="usr">Name:</label>
+				  <input type="number" class="form-control" id="usr" ng-model="currencie2" ng-value="1" min="1">
+				</div>
+
+				<div class="form-group">
+				  
+				  <select class="form-control" ng-model="rate2" id="sel1">
+				  	<option value="EUR">EUR</option>
+				    <option ng-repeat="(key, value) in currencies" ng-value="{{ key }}">{{ key }}</option>
+				  </select>
+
+				</div>
+
+		  	</div>
+
+		  </div>
+		  <div class="row">
+		  	<div class="col-md-12 text-center">
+		  		<h1 style="font-size:64px">{{result}}</h1><span>{{rate}}<span>
+		  	</div>
+		  </div>
+		</div>
+
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+		<script src="js/angular.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<script>
+
+
+			var app = angular.module('myApp', []);
+
+			app.controller('myCtrl',['$scope','$http',function($scope,$http) {
+
+				$scope.currencie1 = 1;
+				$scope.currencie2 = 1;
+				$scope.result = 0;
+				$scope.rate2 = 'EUR';
+				$scope.rate1 = 'EUR';
+
+				$scope.rate1error = false;
+				$scope.rate2error = false;
+
+				$scope.result = 1;
+				$scope.rate = $scope.rate2;
+
+
+				$scope.calculate = function(){
+
+					if($scope.rate1 == $scope.rate2){
+						$scope.result = (1 * $scope.currencie1 )/$scope.currencie2;
+						$scope.rate = $scope.rate2;
+					} else {
+						$http({
+					  		method: 'GET',
+					  		url: 'http://api.fixer.io/latest?base=' + $scope.rate1
+						}).then(function (response) {
+						    // $scope.result = response.data.rates;
+						    currencies(response.data.rates);
+						  }, function (response) {});
+					}
+
+					var currencies = function(data){
+						angular.forEach(data, function(value, key) {
+						  if(key == $scope.rate2){
+						  	result = (( value * $scope.currencie1 )/$scope.currencie2);
+						  	console.log(result);
+
+						  	$scope.result = result.toFixed(2);
+						  	$scope.rate = $scope.rate2;
+						  }
+						});
+					}; 
+
+					
+				};
+
+				$http({
+				  method: 'GET',
+				  url: 'http://api.fixer.io/latest'
+				}).then(function (response) {
+				    $scope.currencies = response.data.rates;
+				  }, function (response) {});
+
+				
+
+
+			}]);
+
+		</script>
+	</body>
+</html>
